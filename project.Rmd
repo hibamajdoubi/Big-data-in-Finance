@@ -1,0 +1,112 @@
+---
+title: "big data in finance"
+author: "Hiba Majdoubi"
+date: "2025-04-23"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+  library(lubridate)
+  library(readr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+
+
+#daily data
+X25_book_to_market_Daily <- read_csv("C:/Users/hibam/OneDrive/Documents/Master Actuariat/Big data in Finance/project/daily/25_Portfolios_5x5_Daily.csv", skip = 18)
+
+
+X100_book_to_market_Daily <- read_csv("C:/Users/hibam/OneDrive/Documents/Master Actuariat/Big data in Finance/project/daily/100_Portfolios_10x10_Daily.csv", skip = 18)
+
+X10_Industry_Portfolios_Daily <- read_csv("C:/Users/hibam/OneDrive/Documents/Master Actuariat/Big data in Finance/project/daily/10_Industry_Portfolios_Daily.csv",skip = 9)
+X48_Industry_Portfolios_Daily <- read_csv("C:/Users/hibam/OneDrive/Documents/Master Actuariat/Big data in Finance/project/daily/48_Industry_Portfolios_Daily.csv", skip = 9)
+
+
+# Mensuel data
+X25_book_to_market <- read_csv("C:/Users/hibam/OneDrive/Documents/Master Actuariat/Big data in Finance/project/mensuel/25_Portfolios_5x5.CSV", skip = 15)
+X100_book_to_market <- read_csv("C:/Users/hibam/OneDrive/Documents/Master Actuariat/Big data in Finance/project/mensuel/100_Portfolios_10x10.CSV",  skip = 15)
+
+X10_Industry_Portfolios <- read_csv("C:/Users/hibam/OneDrive/Documents/Master Actuariat/Big data in Finance/project/mensuel/10_Industry_Portfolios.CSV", skip = 11)
+
+X48_Industry_Portfolios <- read_csv("C:/Users/hibam/OneDrive/Documents/Master Actuariat/Big data in Finance/project/mensuel/48_Industry_Portfolios.CSV",  skip = 11)
+```
+
+
+```{r }
+# clean data, year format, NAs,value-weighted returns %
+
+clean_dataframe <- function(df, output_path, date_format = "monthly") {
+  
+  
+  df_clean <- df %>%
+    rename(YearDate = 1) %>%
+    mutate(
+      Date = case_when(
+        date_format == "monthly" ~ ymd(paste0(YearDate, "01")),
+        date_format == "daily" ~ ymd(YearDate)
+      ),
+      across(-c(YearDate, Date), ~ as.numeric(.x)),
+      across(-c(YearDate, Date), ~ na_if(.x, -99.99)),
+      across(-c(YearDate, Date), ~ na_if(.x, -999)),
+      across(-c(YearDate, Date), ~ .x / 100)
+    ) %>%
+    select(-YearDate) %>%
+    filter(Date >= as.Date("1970-01-01") & Date <= as.Date("2024-12-31"))
+  
+  # Export en CSV propre
+  write_csv(df_clean, file = output_path)
+  
+  return(df_clean)
+}
+
+D25_book_to_market <- clean_dataframe(X25_book_to_market_Daily, "vw_25_daily.csv", date_format = "daily")
+D100_book_to_market <- clean_dataframe(X100_book_to_market_Daily, "vw_100_daily.csv", date_format = "daily")
+D10_Industry_Portfolios <- clean_dataframe(X10_Industry_Portfolios_Daily, "vw_10_daily.csv", date_format = "daily")
+D48_Industry_Portfolios <- clean_dataframe(X48_Industry_Portfolios_Daily, "vw_48_daily.csv", date_format = "daily")
+
+M10_Industry_Portfolios <- clean_dataframe(X10_Industry_Portfolios, "vw_10_monthly.csv", date_format = "monthly")
+M48_Industry_Portfolios <- clean_dataframe(X48_Industry_Portfolios, "vw_48_monthly.csv", date_format = "monthly")
+M100_book_to_market <- clean_dataframe(X100_book_to_market, "vw_100_monthly.csv", date_format = "monthly")
+M25_book_to_market <- clean_dataframe(X25_book_to_market, "vw_25_monthly.csv", date_format = "monthly")
+```
+
+
+
+
+```{r}
+# ======== MISSING VALUES CHECK ========
+
+# Check total number of NA values in the two datasets where we know there are missing values
+sum(is.na(M100_book_to_market))  # Monthly 100 Size-BM
+sum(is.na(D100_book_to_market))  # Daily 100 Size-BM
+
+
+# ======== IMPUTATION STRATEGY ========
+
+# We apply Last Observation Carried Forward (LOCF) and backward fill
+library(zoo)
+
+M100_book_to_market[,-1] <- na.locf(M100_book_to_market[,-1], na.rm = FALSE)
+M100_book_to_market[,-1] <- na.locf(M100_book_to_market[,-1], fromLast = TRUE, na.rm = FALSE)
+
+D100_book_to_market[,-1] <- na.locf(D100_book_to_market[,-1], na.rm = FALSE)
+D100_book_to_market[,-1] <- na.locf(D100_book_to_market[,-1], fromLast = TRUE, na.rm = FALSE)
+
+# Final NA check after imputation
+sum(is.na(M100_book_to_market))  # Should be 0
+sum(is.na(D100_book_to_market))  # Should be 0
+
+# Remove any remaining rows with NAs in the monthly dataset
+# (Only 5 rows affected out of thousands, so impact is negligible)
+M100_book_to_market <- na.omit(M100_book_to_market)
+sum(is.na(M100_book_to_market)) 
+```
+
+
+
+
