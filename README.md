@@ -16,16 +16,16 @@ This R script is designed to **preprocess the Fama-French datasets** (daily and 
 
 The following 8 datasets have been preprocessed:
 
-| Frequency | Dataset                                 | Format | Source       |
-|-----------|------------------------------------------|--------|--------------|
-| Daily     | 25 Portfolios Size-BM                    | CSV    | Fama-French  | Simeon
-| Daily     | 100 Portfolios Size-BM                   | CSV    | Fama-French  |Hiba
-| Daily     | 10 Industry Portfolios                   | CSV    | Fama-French  |Simeon
-| Daily     | 48 Industry Portfolios                   | CSV    | Fama-French  |Fermin
-| Monthly   | 25 Portfolios Size-BM                    | CSV    | Fama-French  |Simeon
-| Monthly   | 100 Portfolios Size-BM                   | CSV    | Fama-French  |Hiba
-| Monthly   | 10 Industry Portfolios                   | CSV    | Fama-French  |Simeon
-| Monthly   | 48 Industry Portfolios                   | CSV    | Fama-French  |Fermin
+| Frequency | Dataset                                 | Format | Source       |               |
+|-----------|------------------------------------------|--------|--------------|--------------|
+| Daily     | 25 Portfolios Size-BM                    | CSV    | Fama-French  | Simeon       |
+| Daily     | 100 Portfolios Size-BM                   | CSV    | Fama-French  |Hiba          |
+| Daily     | 10 Industry Portfolios                   | CSV    | Fama-French  |Simeon        | 
+| Daily     | 48 Industry Portfolios                   | CSV    | Fama-French  |Fermin        |
+| Monthly   | 25 Portfolios Size-BM                    | CSV    | Fama-French  |Simeon        |
+| Monthly   | 100 Portfolios Size-BM                   | CSV    | Fama-French  |Hiba          |
+| Monthly   | 10 Industry Portfolios                   | CSV    | Fama-French  |Simeon        |
+| Monthly   | 48 Industry Portfolios                   | CSV    | Fama-French  |Fermin        |
 
 ---
 
